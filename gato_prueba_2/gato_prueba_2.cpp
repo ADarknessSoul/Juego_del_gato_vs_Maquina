@@ -9,16 +9,24 @@ class Node
 public:
 	Node();
 	Node(int[9]);
-	void Generate(int[9], int, int);
+	void Generate(int[9], int, int, int);
+
 	void setGato(int[9]);
 	int* getGato();
+
+	void setDificultad(int);
+	int getDificultad();
+
 	vector<Node*> getNodos();
 	int determinarTurno(int[9], int);
+
+	static int nivel;
 
 private:
 
 	int gato[9] = { 0,0,0, 0,0,0, 0,0,0 };
 	vector<Node*> Nodos = {};
+	int dificultad = 0;
 
 };
 
@@ -52,13 +60,25 @@ int* Node::getGato() {
 
 }
 
+void Node::setDificultad(int dificultad) {
 
-void Node::Generate(int jugadaInicial[9], int jugadorInicial, int contadorRecursivo) {
+	this->dificultad = dificultad;
+
+}
+
+int Node::getDificultad() {
+
+	return dificultad;
+
+}
+
+void Node::Generate(int jugadaInicial[9], int jugadorInicial, int contadorRecursivo, int dificultad) {
 
 	int gatoRow = 9;
 	int turno;
 	int contadorOffset = contadorRecursivo;
 
+	this->setDificultad(dificultad);
 	this->setGato(jugadaInicial);
 
 	for (int i = 0; i < gatoRow; i++) {
@@ -77,8 +97,13 @@ void Node::Generate(int jugadaInicial[9], int jugadorInicial, int contadorRecurs
 	
 	for (int i = contadorOffset; i + contadorOffset < contadorRecursivo + contadorOffset; i++) {
 
+		if (nivel < dificultad) {
 
-		this->Generate(this->Nodos[i]->gato, jugadorInicial, this->Nodos.size());
+			nivel++;
+			this->Generate(this->Nodos[i]->gato, jugadorInicial, this->Nodos.size(), dificultad);
+			nivel--;
+
+		}
 
 	}
 
@@ -126,13 +151,14 @@ vector<Node*> Node::getNodos() {
 
 }
 
-
+int Node::nivel = 1;
 
 
 int main()
 {
 
 	int jugadorInicial = 2; //1 equivale a la maquina, 2 equivale al humano
+	int dificultad = 0;
 
 	Node gato = Node::Node();
 
@@ -141,16 +167,20 @@ int main()
 
 	int gatoInicial[9] = {
 		0, 0, 0,
-		1, 2, 1,
+		0, 2, 1,
 		2, 1, 2
 	};
 
+	cout << "Elige la dificultad: " << endl;
+	cout << "1.Facil\n2.Dificil\n3.Imposible\n: ";
 
+	cin >> dificultad;
 
-	gato.Generate(gatoInicial, jugadorInicial, 0);
+	gato.Generate(gatoInicial, jugadorInicial, 0, dificultad);
 
 	Grafo = gato.getNodos();
 
 	system("pause");
 
 }
+
