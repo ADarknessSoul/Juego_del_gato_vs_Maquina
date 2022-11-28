@@ -141,6 +141,9 @@
   <ItemGroup>
     <ClCompile Include="gato_prueba_2.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Nodos.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
