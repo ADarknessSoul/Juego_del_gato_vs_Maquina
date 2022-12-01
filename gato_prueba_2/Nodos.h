@@ -28,6 +28,7 @@ public:
 
 	int determinarTurno(int[9], int);
 	int calcularPesos(vector<Node*>);
+	int evitarJugada(vector<Node*>);
 
 	void jugarGato();
 	void dibujarGato();
@@ -204,14 +205,16 @@ int Node::verificar_Ganador(int jugadaActual[9]) {
 
 	//Si no hay ganador, se regresa un -1 para identificar el caso
 	int ganador = 0;
+	int maquina = 1;
+	int humano = -1;
 
 	// verificar  las filas 
 	for (int i = 0; i <= 9;)
 	{
 		if (jugadaActual[i] == jugadaActual[i + 1] && jugadaActual[i] == jugadaActual[i + 2])
 		{
-			if (jugadaActual[i] == 1) return -1;
-			else if (jugadaActual[i] == 2) return 1;
+			if (jugadaActual[i] == 1) return maquina;
+			else if (jugadaActual[i] == 2) return humano;
 		}
 
 		i += 3;
@@ -221,8 +224,8 @@ int Node::verificar_Ganador(int jugadaActual[9]) {
 	{
 		if (jugadaActual[i] == jugadaActual[i + 3] && jugadaActual[i] == jugadaActual[i + 6])
 		{
-			if (jugadaActual[i] == 1) return -1;
-			else if (jugadaActual[i] == 2) return 1;
+			if (jugadaActual[i] == 1) return maquina;
+			else if (jugadaActual[i] == 2) return humano;
 		}
 
 	}
@@ -230,14 +233,14 @@ int Node::verificar_Ganador(int jugadaActual[9]) {
 
 	if (jugadaActual[0] == jugadaActual[4] && jugadaActual[0] == jugadaActual[8])
 	{
-		if (jugadaActual[0] == 1) return -1;
-		else if (jugadaActual[0] == 2) return 1;
+		if (jugadaActual[0] == 1) return maquina;
+		else if (jugadaActual[0] == 2) return humano;
 	}
 
 	if (jugadaActual[2] == jugadaActual[4] && jugadaActual[2] == jugadaActual[6])
 	{
-		if (jugadaActual[2] == 1) return -1;
-		else if (jugadaActual[2] == 2) return 1;
+		if (jugadaActual[2] == 1) return maquina;
+		else if (jugadaActual[2] == 2) return humano;
 	}
 
 	return ganador;
@@ -318,13 +321,28 @@ void Node::jugarGato() {
 
 void Node::dibujarGato() {
 
+	vector<char> gatoChar;
+	int numPosiciones = 9;
+	char humano = 'O';
+	char maquina = 'X';
+	char espacio = ' ';
+
+
+	for (int i = 0; i < numPosiciones; i++) {
+
+		if (this->gato[i] == 0) gatoChar.push_back(espacio);
+		else if (this->gato[i] == 1) gatoChar.push_back(maquina);
+		else if (this->gato[i] == 2) gatoChar.push_back(humano);
+
+	}
+
 	cout << "\n     ######GATO#######\n\n";
 
-	cout << "\t" << this->gato[0] << " | " << this->gato[1] << " | " << this->gato[2] << "\t\t" << "0" << " | " << "1" << " | " << "2" << endl;
+	cout << "\t" << gatoChar[0] << " | " << gatoChar[1] << " | " << gatoChar[2] << "\t\t" << "0" << " | " << "1" << " | " << "2" << endl;
 	cout << "\t----------\t\t----------" << "\n";
-	cout << "\t" << this->gato[3] << " | " << this->gato[4] << " | " << this->gato[5] << "\t\t" << "3" << " | " << "4" << " | " << "5" << endl;
+	cout << "\t" << gatoChar[3] << " | " << gatoChar[4] << " | " << gatoChar[5] << "\t\t" << "3" << " | " << "4" << " | " << "5" << endl;
 	cout << "\t----------\t\t----------" << "\n";
-	cout << "\t" << this->gato[6] << " | " << this->gato[7] << " | " << this->gato[8] << "\t\t" << "6" << " | " << "7" << " | " << "8" << endl;
+	cout << "\t" << gatoChar[6] << " | " << gatoChar[7] << " | " << gatoChar[8] << "\t\t" << "6" << " | " << "7" << " | " << "8" << endl;
 
 	cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
@@ -374,18 +392,21 @@ int Node::compararMatrices(int matrizNodo[9], int jugadaGato[9]) {
 Node* Node::buscarCaminoMasCorto(Node* jugadaActual) {
 
 	Node* aux = new Node();
-	int pesoAux = 999999999;
+	int pesoAux = -999999999;
+	int rechazarJugada = 0;
 
 	for (Node* i : jugadaActual->Nodos) {
 
-		if (i->ganador == -1) {
+		if (i->ganador == 1) {
 
 			aux = i;
 			break;
 
 		}
 
-		if (i->peso < pesoAux) {
+		if(i->dificultad >= 7) rechazarJugada = evitarJugada(i->Nodos);
+
+		if (i->peso > pesoAux && rechazarJugada != 1) {
 
 			pesoAux = i->peso;
 			aux = i;
@@ -400,8 +421,20 @@ Node* Node::buscarCaminoMasCorto(Node* jugadaActual) {
 
 void Node::imprimirMensajeVictoria(int ganador) {
 
-	if (ganador == -1) cout << "\n\n\t Victoria para la maquina!" << endl;
-	else if (ganador == 1) cout << "\n\n\t Victoria para ti!" << endl;
+	if (ganador == 1) cout << "\n\n\t Victoria para la maquina!" << endl;
+	else if (ganador == -1) cout << "\n\n\t Victoria para ti!" << endl;
+
+}
+
+int Node::evitarJugada(vector<Node*>siguienteJugada) {
+
+	for (Node* i : siguienteJugada) {
+
+		if (i->ganador == -1) return 1;
+
+	}
+
+	return 0;
 
 }
 

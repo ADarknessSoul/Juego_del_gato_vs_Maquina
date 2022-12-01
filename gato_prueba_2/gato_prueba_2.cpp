@@ -51,8 +51,6 @@ int main()
 
 	gato.jugarGato();
 
-
-
 	//aux = gato.buscarJugada(Grafo, gatoInicialPrueba);
 
 	system("pause");
