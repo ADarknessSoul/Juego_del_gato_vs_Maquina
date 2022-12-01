@@ -4,7 +4,7 @@
 int main()
 {
 
-	int jugadorInicial = 1; //1 equivale a la maquina, 2 equivale al humano
+	int jugadorInicial = 2; //1 equivale a la maquina, 2 equivale al humano
 	int dificultad = 0; //Los niveles de dificultad equivalen a la profundidad del arbol
 	int ganador = -1;	//Hay tres estados: -1, no es victoria; 0, victoria para la máquina; 999999 (INFINITY), victoria para el humano
 	int peso = 0;
@@ -17,8 +17,8 @@ int main()
 
 
 	//int gatoInicialPrueba[9] = {
+	//	2, 1, 2,
 	//	2, 1, 0,
-	//	0, 0, 0,
 	//	0, 0, 0
 	//};
 
@@ -40,16 +40,16 @@ int main()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	cout << "Elige la dificultad: " << endl;
-	cout << "1.Facil\n2.Dificil\n3.Imposible\n: ";
+	cout << "1-2-3: Facil\n4-5-6: Dificil\n7-8-9: Imposible\n: ";
 
 	cin >> dificultad;
 
 	//Proceso recursivo para generar todas las posibles jugadas
-	gato.Generate(gatoInicial, jugadorInicial, 0, dificultad);
+	if(ganador == 0) gato.Generate(gatoInicial, jugadorInicial, 0, dificultad);
 	Grafo = gato.getNodos();
 	peso = gato.calcularPesos(Grafo);
 
-	//gato.jugarGato();
+	gato.jugarGato();
 
 
 

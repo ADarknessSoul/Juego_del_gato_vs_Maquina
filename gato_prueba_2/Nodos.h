@@ -31,7 +31,9 @@ public:
 
 	void jugarGato();
 	void dibujarGato();
+	void imprimirMensajeVictoria(int);
 	Node* buscarJugada(vector<Node*> Nodo,int[9]);
+	Node* buscarCaminoMasCorto(Node*);
 	int compararMatrices(int[9], int[9]);
 
 	static int nivel;
@@ -247,13 +249,14 @@ void Node::jugarGato() {
 	int numPosiciones = 9;
 	int jugadaGato[9] = { 0 }; 
 	int jugadaHumano = -1; //Se inicializa en valor -1 para poder evaluar valores mayores a 0
+	int ganador = 0;
 	Node* jugadaActual = new Node();
 
 	setGato(jugadaGato);
 
 	dibujarGato();
 
-	for (int i = 0; i < numPosiciones; i++) {
+	for (int i = 0; i < numPosiciones;) {
 
 		while (jugadaHumano < 0 || jugadaHumano > 8) {
 
@@ -274,7 +277,36 @@ void Node::jugarGato() {
 
 		dibujarGato();
 
-		//jugadaActual = buscarJugada(Nodos, this->gato);
+		ganador = verificar_Ganador(this->gato);
+
+		if (ganador != 0) {
+
+			imprimirMensajeVictoria(ganador);
+			break;
+
+		}
+
+		i++;
+		if (i == numPosiciones) break;
+
+		jugadaActual = buscarJugada(Nodos, this->gato);
+
+		jugadaActual = buscarCaminoMasCorto(jugadaActual);
+
+		setGato(jugadaActual->gato);
+
+		dibujarGato();
+
+		ganador = verificar_Ganador(this->gato);
+
+		if (ganador != 0) {
+
+			imprimirMensajeVictoria(ganador);
+			break;
+
+		}
+
+		i++;
 
 
 	}
@@ -288,11 +320,11 @@ void Node::dibujarGato() {
 
 	cout << "\n     ######GATO#######\n\n";
 
-	cout << "\t" << this->gato[0] << " | " << this->gato[1] << " | " << this->gato[2] << endl;
-	cout << "\t----------" << "\n";
-	cout << "\t" << this->gato[3] << " | " << this->gato[4] << " | " << this->gato[5] << endl;
-	cout << "\t----------" << "\n";
-	cout << "\t" << this->gato[6] << " | " << this->gato[7] << " | " << this->gato[8] << endl;
+	cout << "\t" << this->gato[0] << " | " << this->gato[1] << " | " << this->gato[2] << "\t\t" << "0" << " | " << "1" << " | " << "2" << endl;
+	cout << "\t----------\t\t----------" << "\n";
+	cout << "\t" << this->gato[3] << " | " << this->gato[4] << " | " << this->gato[5] << "\t\t" << "3" << " | " << "4" << " | " << "5" << endl;
+	cout << "\t----------\t\t----------" << "\n";
+	cout << "\t" << this->gato[6] << " | " << this->gato[7] << " | " << this->gato[8] << "\t\t" << "6" << " | " << "7" << " | " << "8" << endl;
 
 	cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
@@ -307,18 +339,23 @@ Node* Node::buscarJugada(vector<Node*>Nodo ,int jugadaGato[9]) {
 
 		iguales = compararMatrices(Nodo[i]->gato, jugadaGato);
 
-		i++;
-
 		if (iguales == 1) return Nodo[i];
+
+		i++;
 
 	}
 
 	for (Node* i : Nodo) {
 
-		if(i->Nodos.size() > 0) aux = buscarJugada(i->Nodos ,jugadaGato);
+		if (i->Nodos.size() > 0) {
+			aux = buscarJugada(i->Nodos, jugadaGato);
+			if (compararMatrices(aux->gato, jugadaGato)) return aux;
+		}
 		//if (compararMatrices(aux->gato, jugadaGato)) return aux;
 
 	}
+
+	return aux;
 
 }
 
@@ -331,6 +368,40 @@ int Node::compararMatrices(int matrizNodo[9], int jugadaGato[9]) {
 	}
 
 	return 1;
+
+}
+
+Node* Node::buscarCaminoMasCorto(Node* jugadaActual) {
+
+	Node* aux = new Node();
+	int pesoAux = 999999999;
+
+	for (Node* i : jugadaActual->Nodos) {
+
+		if (i->ganador == -1) {
+
+			aux = i;
+			break;
+
+		}
+
+		if (i->peso < pesoAux) {
+
+			pesoAux = i->peso;
+			aux = i;
+
+		}
+
+	}
+
+	return aux;
+
+}
+
+void Node::imprimirMensajeVictoria(int ganador) {
+
+	if (ganador == -1) cout << "\n\n\t Victoria para la maquina!" << endl;
+	else if (ganador == 1) cout << "\n\n\t Victoria para ti!" << endl;
 
 }
 
