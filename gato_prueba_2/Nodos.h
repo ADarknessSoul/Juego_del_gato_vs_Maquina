@@ -443,9 +443,9 @@ Node* Node::buscarCaminoMasCorto(Node* jugadaActual) {
 
 		}
 
-		//if(i->dificultad >= 7) rechazarJugada = evitarJugada(i->Nodos);
+		if(i->dificultad >= 7) rechazarJugada = evitarJugada(i->Nodos);
 
-		//if (i->peso > pesoAux && rechazarJugada != 1) {
+		
 		if (igualAExc1 || igualAExc2) {
 
 			if (i->peso > pesoAuxExc) {
@@ -458,7 +458,7 @@ Node* Node::buscarCaminoMasCorto(Node* jugadaActual) {
 		}
 		else {
 
-			if (i->peso < pesoAux) {
+			if (i->peso < pesoAux && rechazarJugada != 1) {
 
 				pesoAux = i->peso;
 				aux = i;
@@ -484,7 +484,7 @@ int Node::evitarJugada(vector<Node*>siguienteJugada) {
 
 	for (Node* i : siguienteJugada) {
 
-		if (i->ganador == -1) return 1;
+		if (i->ganador == 2) return 1;
 
 	}
 
