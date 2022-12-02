@@ -29,6 +29,7 @@ public:
 	int determinarTurno(int[9], int);
 	int calcularPesos(vector<Node*>);
 	int evitarJugada(vector<Node*>);
+	int revisarEmpate(int[9]);
 
 	void jugarGato();
 	void dibujarGato();
@@ -205,8 +206,10 @@ int Node::verificar_Ganador(int jugadaActual[9]) {
 
 	//Si no hay ganador, se regresa un -1 para identificar el caso
 	int ganador = 0;
-	int maquina = 1;
-	int humano = -1;
+	int maquina = -2;
+	int empate = -2;
+	int humano = 2;
+	int esEmpate = 0;
 
 	// verificar  las filas 
 	for (int i = 0; i <= 9;)
@@ -243,7 +246,25 @@ int Node::verificar_Ganador(int jugadaActual[9]) {
 		else if (jugadaActual[2] == 2) return humano;
 	}
 
+	esEmpate = revisarEmpate(jugadaActual);
+
+	if (esEmpate) return empate;
+
 	return ganador;
+
+}
+
+int Node::revisarEmpate(int gatoActual[9]) {
+
+	int numPosiciones = 9;
+
+	for (int i = 0; i < numPosiciones; i++) {
+
+		if (gatoActual[i] == 0) return 0;
+
+	}
+
+	return 1;
 
 }
 
@@ -353,7 +374,7 @@ Node* Node::buscarJugada(vector<Node*>Nodo ,int jugadaGato[9]) {
 	int iguales = 0;
 	Node* aux = new Node();
 
-	for (int i = 0; i < Nodo.size() - 1;) {
+	for (int i = 0; i < Nodo.size();) {
 
 		iguales = compararMatrices(Nodo[i]->gato, jugadaGato);
 
@@ -392,24 +413,57 @@ int Node::compararMatrices(int matrizNodo[9], int jugadaGato[9]) {
 Node* Node::buscarCaminoMasCorto(Node* jugadaActual) {
 
 	Node* aux = new Node();
-	int pesoAux = -999999999;
+	int pesoAux = 999999999;
+	int pesoAuxExc = -9999999;
 	int rechazarJugada = 0;
+	int igualAExc1 = 0;
+	int igualAExc2 = 0;
 
-	for (Node* i : jugadaActual->Nodos) {
+	int excepcion1[9] = {
+		2, 0, 0,
+		0, 1, 0,
+		0, 0, 2
+	};
 
-		if (i->ganador == 1) {
+	int excepcion2[9] = {
+		0, 0, 2,
+		0, 1, 0,
+		2, 0, 0
+	};
+
+	igualAExc1 = compararMatrices(jugadaActual->gato, excepcion1);
+	igualAExc2 = compararMatrices(jugadaActual->gato, excepcion2);
+
+ 	for (Node* i : jugadaActual->Nodos) {
+
+		if (i->ganador == -2) {
 
 			aux = i;
 			break;
 
 		}
 
-		if(i->dificultad >= 7) rechazarJugada = evitarJugada(i->Nodos);
+		//if(i->dificultad >= 7) rechazarJugada = evitarJugada(i->Nodos);
 
-		if (i->peso > pesoAux && rechazarJugada != 1) {
+		//if (i->peso > pesoAux && rechazarJugada != 1) {
+		if (igualAExc1 || igualAExc2) {
 
-			pesoAux = i->peso;
-			aux = i;
+			if (i->peso > pesoAuxExc) {
+
+				pesoAuxExc = i->peso;
+				aux = i;
+
+			}
+
+		}
+		else {
+
+			if (i->peso < pesoAux) {
+
+				pesoAux = i->peso;
+				aux = i;
+
+			}
 
 		}
 
